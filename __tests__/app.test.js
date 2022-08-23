@@ -5,6 +5,8 @@ const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
 
 const mockUser = {
+  first_name: 'Test',
+  last_name: 'User',
   email: 'test@example.com',
   password: '123456',
 };
@@ -36,9 +38,11 @@ describe('users', () => {
 
   it('creates a new user', async () => {
     const res = await request(app).post('/api/v1/users').send(mockUser);
-    const { email } = mockUser;
+    const { first_name, last_name, email } = mockUser;
 
     expect(res.body).toEqual({
+      first_name,
+      last_name,
       id: expect.any(String),
       email,
     });
