@@ -47,4 +47,11 @@ describe('users', () => {
       email,
     });
   });
+  it('logs in an existing user', async () => {
+    const res = await request(app)
+      .post('/api/v1/users/sessions')
+      .send({ email: 'test@example.com', password: '123456' });
+
+    expect(res.status).toBe(200);
+  });
 });
