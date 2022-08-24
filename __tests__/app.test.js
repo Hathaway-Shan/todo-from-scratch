@@ -3,7 +3,6 @@ const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
-const { agent } = require('supertest');
 
 const mockUser = {
   first_name: 'Test',
@@ -33,7 +32,7 @@ describe('users', () => {
     return setup(pool);
   });
 
-  it('creates a new user', async () => {
+  it('#post creates a new user', async () => {
     const res = await request(app).post('/api/v1/users').send(mockUser);
     const { first_name, last_name, email } = mockUser;
 
