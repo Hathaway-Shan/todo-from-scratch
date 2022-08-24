@@ -55,7 +55,11 @@ describe('users', () => {
     const [agent, user] = await registerAndLogin();
     const res = await agent.get('/api/v1/users/me');
     expect(res.status).toBe(200);
-    expect(res.body.email).toEqual(user.email);
+    expect(res.body).toEqual({
+      ...user,
+      exp: expect.any(Number),
+      iat: expect.any(Number),
+    });
   });
   it('#get returns a 401 to an unauthenticated user', async () => {
     const res = await request(app).get('/api/v1/users/me');
