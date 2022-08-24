@@ -53,6 +53,12 @@ describe('users', () => {
       message: 'sign in successful',
     });
   });
+  it('#get /me returns the currently logged in user', async () => {
+    const [agent, user] = await registerAndLogin();
+    const res = await agent.get('/api/v1/users/me');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(user);
+  });
   it('#delete /sessions deletes the user session', async () => {
     const [agent] = await registerAndLogin();
     let res = await request(app)
