@@ -58,4 +58,14 @@ describe('users', () => {
       message: 'sign in successful',
     });
   });
+  it('#delete /sessions deletes the user session', async () => {
+    //
+    const [agent] = await registerAndLogin();
+    let res = await request(app)
+      .post('/api/v1/users/sessions')
+      .send({ email: 'test@example.com', password: '123456' });
+    expect(res.status).toBe(200);
+    res = await agent.delete('/api/v1/users/sessions');
+    expect(res.status).toBe(204);
+  });
 });
