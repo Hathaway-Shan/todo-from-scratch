@@ -3,6 +3,7 @@ const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
 const UserService = require('../lib/services/UserService');
+const { agent } = require('supertest');
 
 const mockUser = {
   first_name: 'Test',
@@ -47,11 +48,14 @@ describe('users', () => {
       email,
     });
   });
-  it('logs in an existing user', async () => {
+  it('#posts /sessions logs in an existing user', async () => {
+    await request(app).post('/api/v1/users').send(mockUser);
     const res = await request(app)
       .post('/api/v1/users/sessions')
       .send({ email: 'test@example.com', password: '123456' });
-
     expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      message: 'sign in successful',
+    });
   });
 });
