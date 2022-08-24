@@ -33,10 +33,6 @@ describe('users', () => {
     return setup(pool);
   });
 
-  afterAll(() => {
-    pool.end();
-  });
-
   it('creates a new user', async () => {
     const res = await request(app).post('/api/v1/users').send(mockUser);
     const { first_name, last_name, email } = mockUser;
@@ -59,13 +55,19 @@ describe('users', () => {
     });
   });
   it('#delete /sessions deletes the user session', async () => {
-    //
     const [agent] = await registerAndLogin();
     let res = await request(app)
       .post('/api/v1/users/sessions')
       .send({ email: 'test@example.com', password: '123456' });
     expect(res.status).toBe(200);
     res = await agent.delete('/api/v1/users/sessions');
-    expect(res.status).toBe(204);
+
+    expect(res.body).toEqual({
+      message: 'sign out successful',
+    });
   });
+});
+
+afterAll(() => {
+  pool.end();
 });
