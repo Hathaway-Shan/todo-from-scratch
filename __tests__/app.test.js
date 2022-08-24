@@ -2,7 +2,7 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
-const UserService = require('../lib/services/UserService');
+// const UserService = require('../lib/services/UserService');
 
 const mockUser = {
   first_name: 'Test',
@@ -12,18 +12,18 @@ const mockUser = {
 };
 
 const registerAndLogin = async (userProps = {}) => {
-  const password = userProps.password ?? mockUser.password;
+  // const password = userProps.password ?? mockUser.password;
 
   // Create an "agent" that gives us the ability
   // to store cookies between requests in a test
   const agent = request.agent(app);
 
   // Create a user to sign in with
-  const user = await UserService.create({ ...mockUser, ...userProps });
-
   // ...then sign in
-  const { email } = user;
-  await agent.post('/api/v1/users/sessions').send({ email, password });
+  const res = await agent
+    .post('/api/v1/users')
+    .send({ ...mockUser, ...userProps });
+  const user = res.body;
   return [agent, user];
 };
 
@@ -44,20 +44,22 @@ describe('users', () => {
     });
   });
   it('#posts /sessions logs in an existing user', async () => {
-    await request(app).post('/api/v1/users').send(mockUser);
+    const user = await request(app).post('/api/v1/users').send(mockUser);
     const res = await request(app)
       .post('/api/v1/users/sessions')
       .send({ email: 'test@example.com', password: '123456' });
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      message: 'sign in successful',
-    });
+    expect(res.body).toEqual(user.body);
   });
   it('#get /me returns the currently logged in user', async () => {
     const [agent, user] = await registerAndLogin();
     const res = await agent.get('/api/v1/users/me');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(user);
+    expect(res.body.email).toEqual(user.email);
+  });
+  it('#get returns a 401 to an unauthenticated user', async () => {
+    const res = await request(app).get('/api/v1/users/me');
+    expect(res.status).toBe(401);
   });
   it('#delete /sessions deletes the user session', async () => {
     const [agent] = await registerAndLogin();
