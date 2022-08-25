@@ -72,6 +72,10 @@ describe('users', () => {
       },
     ]);
   });
+  it('#get /todos returns a 401 to an unauthenticated user', async () => {
+    const res = await request(app).get('/api/v1/todos');
+    expect(res.status).toBe(401);
+  });
 });
 
 afterAll(() => {
