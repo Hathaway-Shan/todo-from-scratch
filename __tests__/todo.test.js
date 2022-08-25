@@ -62,9 +62,15 @@ describe('users', () => {
     expect(res.body.user_id).toEqual(user.id);
 
     res = await agent.get('/api/v1/todos');
-    console.log('test ----->', res.body);
     expect(res.status).toBe(200);
-    expect(res.body.length).toEqual(1);
+    expect(res.body).toEqual([
+      {
+        id: '1',
+        user_id: '1',
+        content: 'walk the car',
+        finished: false,
+      },
+    ]);
   });
 });
 
