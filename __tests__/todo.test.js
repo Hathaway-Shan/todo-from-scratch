@@ -47,6 +47,25 @@ describe('users', () => {
       finished: false,
     });
   });
+  it('#post /todos returns a 401 to an unauthenticated user', async () => {
+    const res = await request(app).post('/api/v1/todos').send({
+      content: 'wash the dog',
+    });
+    expect(res.status).toBe(401);
+  });
+  it('#get returns a list of an authenticated users todos', async () => {
+    const [agent, user] = await registerAndLogin();
+    let res = await agent.post('/api/v1/todos').send({
+      content: 'walk the car',
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.user_id).toEqual(user.id);
+
+    res = await agent.get('/api/v1/todos');
+    console.log('test ----->', res.body);
+    expect(res.status).toBe(200);
+    expect(res.body.length).toEqual(1);
+  });
 });
 
 afterAll(() => {
