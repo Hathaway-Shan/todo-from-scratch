@@ -55,13 +55,13 @@ describe('users', () => {
   });
   it('#get returns a list of an authenticated users todos', async () => {
     const [agent, user] = await registerAndLogin();
-    let res = await agent.post('/api/v1/todos').send({
+    const firstRes = await agent.post('/api/v1/todos').send({
       content: 'walk the car',
     });
-    expect(res.status).toBe(200);
-    expect(res.body.user_id).toEqual(user.id);
+    expect(firstRes.status).toBe(200);
+    expect(firstRes.body.user_id).toEqual(user.id);
 
-    res = await agent.get('/api/v1/todos');
+    const res = await agent.get('/api/v1/todos');
     expect(res.status).toBe(200);
     expect(res.body).toEqual([
       {
@@ -75,6 +75,19 @@ describe('users', () => {
   it('#get /todos returns a 401 to an unauthenticated user', async () => {
     const res = await request(app).get('/api/v1/todos');
     expect(res.status).toBe(401);
+  });
+  it('#put /api/v1/todos/:id updates an existing todo', async () => {
+    const [agent] = await registerAndLogin();
+    const testTodo = await agent
+      .post('/api/v1/todos')
+      .send({ content: 'complete this todo' });
+    expect(testTodo.status).toBe(200);
+    const res = await agent
+      .put(`/api/v1/todos/${testTodo.body.id}`)
+      .send({ finished: true });
+    console.log(res.body);
+    expect(res.status).toBe(200);
+    expect(res.body.finished).toEqual(true);
   });
 });
 
