@@ -18,3 +18,4 @@ CREATE TABLE todos (
   finished BOOLEAN DEFAULT 'false',
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
