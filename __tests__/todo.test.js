@@ -132,6 +132,21 @@ describe('users', () => {
 
     expect(res.status).toBe(401);
   });
+  it('#delete /api/v1/todos/:id returns a 403 to an unauthenticated user', async () => {
+    const [agent] = await registerAndLogin();
+    const agent2 = await request.agent(app);
+    await agent2.post('/api/v1/users').send(mockUser2);
+    const secondLogin = await agent2
+      .post('/api/v1/users/sessions')
+      .send({ email: 'test2@example.com', password: '234567' });
+    expect(secondLogin.status).toBe(200);
+    const todo = await agent
+      .post('/api/v1/todos')
+      .send({ content: 'delete me' });
+
+    const res = await agent2.delete(`/api/v1/todos/${todo.body.id}`);
+    expect(res.status).toBe(403);
+  });
 });
 
 afterAll(() => {
