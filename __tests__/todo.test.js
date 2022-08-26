@@ -114,6 +114,20 @@ describe('users', () => {
 
     expect(res.status).toBe(403);
   });
+  it('#delete /api/v1/todos/:id deletes a todo', async () => {
+    //
+    const [agent] = await registerAndLogin();
+    const todo = await agent
+      .post('/api/v1/todos')
+      .send({ content: 'delete me' });
+
+    let res = await agent.delete(`/api/v1/todos/${todo.body.id}`);
+    expect(res.status).toBe(200);
+    console.log('first res --->', res.body);
+    res = await agent.get(`/api/v1/todos/${todo.body.id}`);
+    console.log('second res --->', res.body);
+    expect(res.status).toBe(404);
+  });
 });
 
 afterAll(() => {
