@@ -9,6 +9,12 @@ const mockUser = {
   email: 'test@example.com',
   password: '123456',
 };
+const mockUser2 = {
+  first_name: 'Test2',
+  last_name: 'User2',
+  email: 'test2@example.com',
+  password: '234567',
+};
 
 const registerAndLogin = async (userProps = {}) => {
   const agent = request.agent(app);
@@ -85,9 +91,28 @@ describe('users', () => {
     const res = await agent
       .put(`/api/v1/todos/${testTodo.body.id}`)
       .send({ finished: true });
-    console.log(res.body);
+
     expect(res.status).toBe(200);
     expect(res.body.finished).toEqual(true);
+  });
+  it('#put /api/v1/todos/:id returns 403 to an unauthorized user', async () => {
+    const [agent] = await registerAndLogin();
+    const agent2 = await request.agent(app);
+    await agent2.post('/api/v1/users').send(mockUser2);
+    const secondLogin = await agent2
+      .post('/api/v1/users/sessions')
+      .send({ email: 'test2@example.com', password: '234567' });
+    expect(secondLogin.status).toBe(200);
+
+    const testTodo = await agent
+      .post('/api/v1/todos')
+      .send({ content: 'complete this todo' });
+    expect(testTodo.status).toBe(200);
+    const res = await agent2
+      .put(`/api/v1/todos/${testTodo.body.id}`)
+      .send({ finished: true });
+
+    expect(res.status).toBe(403);
   });
 });
 
