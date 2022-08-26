@@ -125,6 +125,13 @@ describe('users', () => {
     res = await agent.get(`/api/v1/todos/${todo.body.id}`);
     expect(res.status).toBe(404);
   });
+  it('#delete /api/v1/todos/:id returns a 401 to an unauthenticated user', async () => {
+    const res = await request(app)
+      .post('/api/v1/todos')
+      .send({ content: 'this will 401' });
+
+    expect(res.status).toBe(401);
+  });
 });
 
 afterAll(() => {
